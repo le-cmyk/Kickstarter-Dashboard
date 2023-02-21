@@ -1,7 +1,7 @@
 
 # Interactive Dashboard with Python – Streamlit
 
-Dashboard for Kickstarter built in Python and the Streamlit library to visualize the data.
+Dashboard for Kickstarter built in Python and the Streamlit library to visualize the dataset.
 
 
 ## Run the app
