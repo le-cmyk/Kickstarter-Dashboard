@@ -1,10 +1,8 @@
-# @Email:  contact@pythonandvba.com
-# @Website:  https://pythonandvba.com
-# @YouTube:  https://youtube.com/c/CodingIsFun
-# @Project:  Sales Dashboard w/ Streamlit
+# to run the app : streamlit run app.py
+# to have the correct version  : pipreqs --encoding=utf8 --force
 
 
-
+import base64
 import pandas as pd  # pip install pandas openpyxl
 import plotly.express as px  # pip install plotly-express
 import plotly.graph_objects as go
@@ -128,7 +126,7 @@ with c_2:
     st.subheader(f"{avg_completion} %")
 with c_3:
     st.subheader("Average plegde:")
-    st.subheader(f"USD $ {average_pledge:,}")
+    st.subheader(f"$ {average_pledge:,}")
 with c_4:
     st.subheader("Number of project:")
     st.subheader(f"{number_of_projetcs}")
@@ -140,8 +138,17 @@ st.markdown("""---""")
 #  - Number of Projects Launched over Time
 launch_counts = df_selection["launched"].sort_values().reset_index()
 fig_Number_Projects_over_Time = px.line(launch_counts, x='launched', title='Evolution of the cumulated Number of Projects')
+fig_Number_Projects_over_Time['data'][0]['showlegend'] = True
+fig_Number_Projects_over_Time['data'][0]['name'] = 'Cumulated number of projects'
 fig_Number_Projects_over_Time.update_xaxes(title='Time')
 fig_Number_Projects_over_Time.update_yaxes(title='Number of Projects launched')
+fig_Number_Projects_over_Time.update_layout(
+    legend=dict(
+        x=0,
+        y=1,
+    )
+)
+
 
 
 fig_states = go.Figure(data=[go.Pie(labels=df_selection["state"], textinfo='label+percent',
@@ -164,8 +171,16 @@ with right_column:
 
 # - Create stacked bar chart with number of values
 
+#trie des données
 df_goupe=df_selection.groupby(by=['category', 'state'])['ID'].count().reset_index()
-fig_number_values = px.bar(df_goupe, x='category', y='ID', color='state', barmode='stack',text_auto=True)
+grouped_sorted_columns = df_goupe.groupby(['category'])['ID'].sum().sort_values().index
+
+df_goupe['category'] = pd.Categorical(df_goupe['category'], categories=grouped_sorted_columns, ordered=True)
+
+sorted_df = df_goupe.sort_values(by=['category', 'state'])
+
+
+fig_number_values = px.bar(sorted_df, x='category', y='ID', color='state', barmode='stack',text_auto=True)
 
 fig_number_values.update_layout(title='Number of projects by category and status', xaxis_title='Category', yaxis_title='Number of projects')
 fig_number_values.update_layout(
@@ -178,8 +193,18 @@ fig_number_values.update_layout(
 
 # - Create stacked bar chart with the average pledge amount with the ratio 
 
-df_goupe=df_selection.groupby(by=['category', 'state']).mean().reset_index()
-fig_avg_values = px.bar(df_goupe, x='category', y='pledged', color='state', barmode='stack',text_auto=True)
+#trie des données
+
+df_goupe=df_selection.groupby(by=['category', 'state'])["pledged"].mean().reset_index()
+
+grouped_sorted_columns = df_goupe.groupby(['category'])['pledged'].sum().sort_values().index
+
+df_goupe['category'] = pd.Categorical(df_goupe['category'], categories=grouped_sorted_columns, ordered=True)
+
+sorted_df = df_goupe.sort_values(by=['category', 'state'])
+
+
+fig_avg_values = px.bar(sorted_df, x='category', y='pledged', color='state', barmode='stack',text_auto=True)
 
 fig_avg_values.update_layout(title='Mean of the pledged by projects and status', xaxis_title='Category', yaxis_title='US $')
 fig_avg_values.update_layout(
@@ -226,9 +251,34 @@ for index, row in df_countries.iterrows():
 
 
 
-folium_static(world_map,width=725,height=325)
+folium_static(world_map,height=325)#width=725
+
+# - Affichage des données
 
 st.write(df_selection)
+st.markdown("""---""")
+
+LIEN = {
+    "Léo Dujourd'hui": "https://leo-dujourd-hui-digital-cv.streamlit.app",
+}
+
+
+
+# - Téléchargement des données 
+
+def download_button(data, file_name, button_text):
+    csv = data.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">{button_text}</a>'
+    st.markdown(href, unsafe_allow_html=True)
+
+c_1, c_2 = st.columns([3, 1])
+with c_1:
+    for clé, link in LIEN.items():
+        st.write(f"This Dashboard was made by : [{clé}]({link})")
+with c_2:
+    download_button(df, 'data.csv', '📄 Download Sorted Data')
+
 
 # ---- HIDE STREAMLIT STYLE ----
 hide_st_style = """
