@@ -261,6 +261,9 @@ st.markdown("""---""")
 LIEN = {
     "Léo Dujourd'hui": "https://leo-dujourd-hui-digital-cv.streamlit.app",
 }
+SOURCES ={
+    "Github": "https://github.com/le-cmyk/Kickstarter-Dashboard"
+}
 
 
 
@@ -272,11 +275,14 @@ def download_button(data, file_name, button_text):
     href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">{button_text}</a>'
     st.markdown(href, unsafe_allow_html=True)
 
-c_1, c_2 = st.columns([3, 1])
+c_1, c_2,c_3 = st.columns(3)
 with c_1:
     for clé, link in LIEN.items():
-        st.write(f"This Dashboard was made by : [{clé}]({link})")
+        st.write(f"Made by : [{clé}]({link})")
 with c_2:
+    for clé, link in SOURCES.items():
+        st.write(f"[{clé}]({link})")
+with c_3:
     download_button(df, 'data.csv', '📄 Download Sorted Data')
 
 
