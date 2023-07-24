@@ -13,6 +13,7 @@ from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 
 
+
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 st.set_page_config(page_title="Kickstarter Dashboard", page_icon=":bar_chart:", layout="wide")
 
@@ -46,8 +47,8 @@ def get_data_from_csv():
     df['launched'] = df['launched'].str.replace('-', ' ')
 
     # Convert columns to appropriate data types
-    df['deadline'] = pd.to_datetime(df['deadline'], format='%Y %m %d %H:%M:%S')
-    df['launched'] = pd.to_datetime(df['launched'], format='%Y %m %d %H:%M:%S')
+    df['deadline'] = pd.to_datetime(df['deadline'], format='%Y %m %d')# %H:%M:%S')
+    df['launched'] = pd.to_datetime(df['launched'], format='%Y %m %d')# %H:%M:%S')
     df[['goal', 'pledged', 'usd pledged', 'usd_pledged_real', 'usd_goal_real']] = df[['goal', 'pledged', 'usd pledged', 'usd_pledged_real', 'usd_goal_real']].astype(float)
     df[['ID', 'backers']] = df[['ID', 'backers']].astype(int)
 
@@ -258,6 +259,9 @@ folium_static(world_map,height=325)#width=725
 st.write(df_selection)
 st.markdown("""---""")
 
+
+# - LIENS
+
 LIEN = {
     "Léo Dujourd'hui": "https://leo-dujourd-hui-digital-cv.streamlit.app",
 }
@@ -284,6 +288,7 @@ with c_2:
         st.write(f"[{clé}]({link})")
 with c_3:
     download_button(df, 'data.csv', '📄 Download Sorted Data')
+
 
 
 # ---- HIDE STREAMLIT STYLE ----
